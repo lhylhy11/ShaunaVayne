@@ -1,0 +1,65 @@
+配置web相关的:
+      * 配置servlet两种方式
+        一种是使用源生servlet注解进行配置.
+           @webservlet @weblistener @webfilter
+        另一种就是使用springboot提供的三个bean进行配置,分别是,监听/过滤/servlet.三种.
+springcloud配置springboot.docker
+
+****
+配置多个事务管理者,
+@EnableTransactionManagement // 开启注解事务管理，等同于xml配置文件中的 <tx:annotation-driven />
+@SpringBootApplication
+public class ProfiledemoApplication implements TransactionManagementConfigurer {
+
+    @Resource(name="txManager2")
+    private PlatformTransactionManager txManager2;
+
+    // 创建事务管理器1
+    @Bean(name = "txManager1")
+    public PlatformTransactionManager txManager(DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
+    }
+
+    // 创建事务管理器2
+    @Bean(name = "txManager2")
+    public PlatformTransactionManager txManager2(EntityManagerFactory factory) {
+        return new JpaTransactionManager(factory);
+    }
+
+    // 实现接口 TransactionManagementConfigurer 方法，其返回值代表在拥有多个事务管理器的情况下默认使用的事务管理器
+    @Override
+    public PlatformTransactionManager annotationDrivenTransactionManager() {
+        return txManager2;
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(ProfiledemoApplication.class, args);
+    }
+
+}
+@Component
+public class DevSendMessage implements SendMessage {
+
+    // 使用value具体指定使用哪个事务管理器
+    @Transactional(value="txManager1")
+    @Override
+    public void send() {
+        System.out.println(">>>>>>>>Dev Send()<<<<<<<<");
+        send2();
+    }
+
+    // 在存在多个事务管理器的情况下，如果使用value具体指定
+    // 则默认使用方法 annotationDrivenTransactionManager() 返回的事务管理器
+    @Transactional
+    public void send2() {
+        System.out.println(">>>>>>>>Dev Send2()<<<<<<<<");
+    }
+}
+readOnly	该属性用于设置当前事务是否为只读事务，设置为true表示只读，false则表示可读写，默认值为false。例如：@Transactional(readOnly=true)
+rollbackFor	该属性用于设置需要进行回滚的异常类数组，当方法中抛出指定异常数组中的异常时，则进行事务回滚。例如：指定单一异常类：@Transactional(rollbackFor=RuntimeException.class)指定多个异常类：@Transactional(rollbackFor={RuntimeException.class, Exception.class})
+rollbackForClassName	该属性用于设置需要进行回滚的异常类名称数组，当方法中抛出指定异常名称数组中的异常时，则进行事务回滚。例如：指定单一异常类名称@Transactional(rollbackForClassName=”RuntimeException”)指定多个异常类名称：@Transactional(rollbackForClassName={“RuntimeException”,”Exception”})
+noRollbackFor	该属性用于设置不需要进行回滚的异常类数组，当方法中抛出指定异常数组中的异常时，不进行事务回滚。例如：指定单一异常类：@Transactional(noRollbackFor=RuntimeException.class)指定多个异常类：@Transactional(noRollbackFor={RuntimeException.class, Exception.class})
+noRollbackForClassName	该属性用于设置不需要进行回滚的异常类名称数组，当方法中抛出指定异常名称数组中的异常时，不进行事务回滚。例如：指定单一异常类名称：@Transactional(noRollbackForClassName=”RuntimeException”)指定多个异常类名称：@Transactional(noRollbackForClassName={“RuntimeException”,”Exception”})
+propagation	该属性用于设置事务的传播行为。例如：@Transactional(propagation=Propagation.NOT_SUPPORTED,readOnly=true)
+isolation	该属性用于设置底层数据库的事务隔离级别，事务隔离级别用于处理多事务并发的情况，通常使用数据库的默认隔离级别即可，基本不需要进行设置
+timeout	该属性用于设置事务的超时秒数，默认值为-1表示永不超时
