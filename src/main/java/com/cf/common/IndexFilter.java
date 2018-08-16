@@ -23,8 +23,9 @@ public class IndexFilter implements Filter{
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
-        System.out.println("------------------------------------------filter"+urlList.size());
+            System.out.println("------------------------------------------filter"+urlList.size());
             filterChain.doFilter(servletRequest,servletResponse);
+            System.out.println("------------------------------------------filter   回也经过");
     }
 
     @Override

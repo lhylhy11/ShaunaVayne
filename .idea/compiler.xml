@@ -6,11 +6,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="ShaunaVayne" />
         <module name="springBoot" />
         <module name="springBootAndCloud" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="ShaunaVayne" target="1.8" />
       <module name="springBoot" target="1.8" />
       <module name="springBootAndCloud" target="1.8" />
     </bytecodeTargetLevel>
